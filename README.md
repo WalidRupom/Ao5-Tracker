@@ -1,6 +1,12 @@
 # Ao5-Tracker
-IN a standard World Tour we can easily check the solves and the Average
-Tracks the ao5 of players. 
+In a standard World Tour we can easily check the solves and the Average of the players,
+where we can separate the best and worst time of the solves and keep the rest three available solves to count the prominent averages of the players 5 solves.
+
+To tracks the ao5 of players, the code first asks for the username , then asks for the results of the solves one by one, after 5 attempts the system excllludes the highest and the lowest count,
+using the 3 solves it counts and gives the user the Ao5. it again aks for further player information on new players ,while keeping the previous information saved.
+if selected on the load results in any point, the code will show the all previously saved database untill clicked on exist.
+
+for a better service the information that can be saved has been saved to 20 players, based on a average perticipant count. 
 
 #include <stdio.h>
 
