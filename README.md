@@ -8,6 +8,9 @@ if selected on the load results in any point, the code will show the all previou
 
 for a better service the information that can be saved has been saved to 20 players, based on a average perticipant count. 
 
+
+
+
 #include <stdio.h>
 
 #define MAX_PLAYERS 20
