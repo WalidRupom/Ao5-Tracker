@@ -1,85 +1,94 @@
-# Ao5-Tracker
-In a standard World Tour we can easily check the solves and the Average of the players,
-where we can separate the best and worst time of the solves and keep the rest three available solves to count the prominent averages of the players 5 solves.
+This project will create a C program that manages a Rubik’s Cube speed-solving tournament. The program will allow the user to enter player information, record their solve times, and automatically calculate each player’s AO5 (Average of 5). After collecting all data, the program will display each player’s results, rank all participants based on their AO5, and determine the 1st, 2nd, and 3rd place winners. This program solves the problem of manually tracking competition data and ensures accurate and quick ranking.
 
-To tracks the ao5 of players, the code first asks for the username , then asks for the results of the solves one by one, after 5 attempts the system excllludes the highest and the lowest count,
-using the 3 solves it counts and gives the user the Ao5. it again aks for further player information on new players ,while keeping the previous information saved.
-if selected on the load results in any point, the code will show the all previously saved database untill clicked on exist.
+Main features:
 
-for a better service the information that can be saved has been saved to 20 players, based on a average perticipant count. 
+1. Add player information (name and ID).
+2. Enter five solve times for each player.
+3. Auto-calculate AO5 according to standard rules (best & worst removed, average of remaining 3).
+4. Display all player results in a clean table.
+5. Rank players based on AO5 and show top 3 winners.
+6. Save all results to a file for later viewing.
 
+Concepts
 
+Structures- to store player names, solve times, and AO5.
+dynamic Memory Allocation-(`malloc`) to create arrays for any number of players.
+Pointers-for passing structures to functions and sorting.
+Functions-for input, calculation, sorting, and display.
+file Handling- to save and load tournament results.
+
+Expected Output / User Interface
+
+The program will have a text-based menu where the user enters the number of players, inputs their times, and views results. After all data is entered, the program will show a formatted list of players with their AO5 values and display the top 3 winners. The final results will also be written to a text file.
 
 
 #include <stdio.h>
+#include <stdlib.h>
 
-#define MAX_PLAYERS 20
-#define MAX_SOLVES 5
-
-struct Player {
+typedef struct {
     char name[50];
-    float times[MAX_SOLVES];
-    float average;
-};
+    float times[5];
+    float ao5;
+} Player;
 
-int main() {
-    struct Player players[MAX_PLAYERS];
-    int playerCount = 0;
-    int choice;
+float calculateAO5(float t[]) {
+    float min = t[0], max = t[0], sum = 0;
+    for (int i = 0; i < 5; i++) {
+        sum += t[i];
+        if (t[i] < min) min = t[i];
+        if (t[i] > max) max = t[i];
+    }
+    return (sum - min - max) / 3.0;
+}
 
-    while (1) {
-        printf("\n1. Add New Player\n");
-        printf("2. Show All Results\n");
-        printf("3. Exit\n");
-        printf("Enter your choice: ");
-        scanf("%d", &choice);
-
-        if (choice == 1) {
-            if (playerCount >= MAX_PLAYERS) {
-                printf("Cannot add more players!\n");
-                continue;
+void sortPlayers(Player *p, int n) {
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = i + 1; j < n; j++) {
+            if (p[i].ao5 > p[j].ao5) {
+                Player temp = p[i];
+                p[i] = p[j];
+                p[j] = temp;
             }
-
-            printf("Enter player name: ");
-            scanf("%s", players[playerCount].name);
-
-            float sum = 0, max = 0, min = 9999;
-            printf("Enter 5 solve times for %s:\n", players[playerCount].name);
-            for (int i = 0; i < MAX_SOLVES; i++) {
-                printf("Solve %d: ", i + 1);
-                scanf("%f", &players[playerCount].times[i]);
-                sum += players[playerCount].times[i];
-                if (players[playerCount].times[i] > max) max = players[playerCount].times[i];
-                if (players[playerCount].times[i] < min) min = players[playerCount].times[i];
-            }
-
-            players[playerCount].average = (sum - max - min) / 3.0;
-            printf("%s's Ao5 = %.3f\n", players[playerCount].name, players[playerCount].average);
-
-            playerCount++;
-        }
-
-        else if (choice == 2) {
-            if (playerCount == 0) {
-                printf("No results yet.\n");
-                continue;
-            }
-
-            printf("\nAll Saved Results:\n");
-            for (int i = 0; i < playerCount; i++) {
-                printf("%d. %s - Ao5: %.3f\n", i + 1, players[i].name, players[i].average);
-            }
-        }
-
-        else if (choice == 3) {
-            printf("Exiting...\n");
-            break;
-        }
-
-        else {
-            printf("Invalid choice, try again.\n");
         }
     }
+}
 
+int main() {
+    int n;
+    printf("Enter number of players: ");
+    scanf("%d", &n);
+
+    Player *p = malloc(n * sizeof(Player));
+
+    for (int i = 0; i < n; i++) {
+        printf("\nPlayer %d name: ", i + 1);
+        scanf("%s", p[i].name);
+
+        printf("Enter 5 solve times:\n");
+        for (int j = 0; j < 5; j++) {
+            printf("Time %d: ", j + 1);
+            scanf("%f", &p[i].times[j]);
+        }
+
+        p[i].ao5 = calculateAO5(p[i].times);
+    }
+
+    sortPlayers(p, n);
+
+    printf("\n===== Final Ranking =====\n");
+    for (int i = 0; i < n; i++) {
+        printf("%d. %s - AO5: %.3f\n", i + 1, p[i].name, p[i].ao5);
+    }
+
+    FILE *f = fopen("tournament_results.txt", "w");
+    for (int i = 0; i < n; i++) {
+        fprintf(f, "%d. %s - AO5: %.3f\n", i + 1, p[i].name, p[i].ao5);
+    }
+    fclose(f);
+
+    printf("\nResults saved to tournament_results.txt\n");
+
+    free(p);
     return 0;
 }
+
